@@ -28,7 +28,7 @@ The renderer is based on **SIBR** to rendering 3D Gaussian Splatting model files
 - Checkout this repository's master branch:
   
   ```sh
-  git clone https://gitlab.inria.fr/sibr/sibr_core.git -b master
+  git clone https://github.com/Rainzor/Renderer-3dgs.git --recursive
   ```
 
 ## 3. Compile
