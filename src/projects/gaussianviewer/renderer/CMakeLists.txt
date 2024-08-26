@@ -12,7 +12,7 @@ project(sibr_${SIBR_PROJECT} LANGUAGES CXX)
 
 sibr_gitlibrary(TARGET CudaRasterizer
     GIT_REPOSITORY 	"https://github.com/Rainzor/diff-gaussian-rasterization.git"
-    GIT_TAG			"d1897b785a06f2d4fd63b502c0b65fad55d9cf77"
+    GIT_TAG			"ef26a8c8cbe219f5f344c5b4acfa0b42c5447907"
 )
 find_package(CUDAToolkit REQUIRED)
 

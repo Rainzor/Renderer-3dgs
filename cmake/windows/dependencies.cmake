@@ -209,10 +209,12 @@ if (WIN32)
 		CHECK_CACHED_VAR OpenCV_DIR PATH "install" ## see OpenCVConfig.cmake
 	    )
 	elseif (MSVC11 OR MSVC12)
+        message("MSVC11 or MSVC12 for OpenCV")
 	    set(opencv_set_arguments 
 		CHECK_CACHED_VAR OpenCV_DIR PATH "opencv/build" ## see OpenCVConfig.cmake
 	    )
 	elseif (MSVC14)
+        message("MSVC14 for OpenCV")
 	    set(opencv_set_arguments 
 		CHECK_CACHED_VAR OpenCV_DIR PATH "opencv-4.5.0/build" ## see OpenCVConfig.cmake
 	    )

@@ -412,14 +412,6 @@ sibr::GaussianView::GaussianView(const sibr::BasicIBRScene::Ptr & ibrScene, uint
 	// Mipmap
 	mipmap_size = (int)(render_w * render_h* 1.5);// 1.5 is a magic number, it should be enough for the mipmap
 
-	// mipmap_size = 0;
-	// int mipmap_scale = 1;
-	// for (int i = 0; i < max_level; i++) {
-	// 	int w = (render_w + mipmap_scale - 1) / mipmap_scale;
-	// 	int h = (render_h + mipmap_scale - 1) / mipmap_scale;
-	// 	mipmap_size += w * h;
-	// 	mipmap_scale *= 2;
-	// }
 	float* depthMipmaps;
 	CUDA_SAFE_CALL_ALWAYS(cudaMalloc((void**)&depth_map_cuda, mipmap_size * sizeof(float)));
 
@@ -597,6 +589,7 @@ void sibr::GaussianView::onRenderIBR(sibr::IRenderTarget & dst, const sibr::Came
 			depthmap,
 			reinterpret_cast<char*>(geomPtr),
 			buttonPressed,
+			_tile_culling,
 			boxmin,
 			boxmax
 		);
@@ -661,7 +654,7 @@ void sibr::GaussianView::onGUI()
 		ImGui::EndCombo();
 	}
 	ImGui::InputInt("Level", &max_level,1,2);
-	// ImGui::Checkbox("Fast culling", &_fastCulling);
+	ImGui::Checkbox("Tile Culling", &_tile_culling);
 	if(ImGui::Button("Save Frame Data"))
 	{
 		buttonPressed = true;

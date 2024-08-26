@@ -89,6 +89,7 @@ namespace sibr {
 		std::string depthCullingMode = "None";
 
 		bool buttonPressed = false;
+		bool _tile_culling = false;
 
 		bool _cropping = false;
 		sibr::Vector3f _boxmin, _boxmax, _scenemin, _scenemax;
