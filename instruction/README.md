@@ -60,10 +60,10 @@ cmake --build build --target install --config Release -j
 
 ### 2.1 Background
 
-3DGS 数据由中心位置 $\mu$，协方差矩阵 $\Sigma$，透明度 $o$，颜色 $c$ 描述场景中的光辐射场，在给定相机位置和视角 $V$ 下，通过 $\alpha$ - Blending 过程，渲染透明材质物体结果：
+3DGS 数据由中心位置 $\mu$，协方差矩阵 $\Sigma$，透明度 $o$，颜色 $c$ 描述场景中的光辐射场，在给定相机位置和视角 $V$ 下，通过 $\alpha$ - Blending 过程，渲染透明材质物体结果。
 
 $$
-C(p) = \sum_{i=1}^N c^{\prime}_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
+C(p)=\sum_{i=1}^N c_i'\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
 $$
 
 其中， $c_i’$ 是当前视角 $V$ 下的光照颜色， $\alpha_i = o_i \cdot \exp\{-\frac12(p-\mu_i’)\Sigma_i^{’-1}(p-\mu_i')\}$ 是透明度渲染权重， $\mu_i'$ ， $\Sigma_i'$ 是投影坐标空间下高斯球中心位置和协方差矩阵。
