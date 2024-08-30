@@ -61,7 +61,6 @@ cmake --build build --target install --config Release -j
 ### 2.1 Background
 
 3DGS 数据由中心位置 $\mu$，协方差矩阵 $\Sigma$，透明度 $o$，颜色 $c$ 描述场景中的光辐射场，在给定相机位置和视角 $V$ 下，通过 $\alpha$ - Blending 过程，渲染透明材质物体结果。
-
 $$
 C(p)=\sum_{i=1}^N c_i'\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
 $$
@@ -157,7 +156,7 @@ $$
 
 #### Depth Regularization
 
-考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) 的做法，采取了以下深度正则化方式：
+考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) 的做法，采取了以下深度正则化方式。
 
 $$
 \mathcal{L}_d=\sum_{all\;pixels}{\sum_{i=1}^N\sum_{j=1}^{i-1}\alpha_i\alpha_j(z_i-z_j)^2}
