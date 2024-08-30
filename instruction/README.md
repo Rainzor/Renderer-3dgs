@@ -61,11 +61,12 @@ cmake --build build --target install --config Release -j
 ### 2.1 Background
 
 3DGS 数据由中心位置 $\mu$，协方差矩阵 $\Sigma$，透明度 $o$，颜色 $c$ 描述场景中的光辐射场，在给定相机位置和视角 $V$ 下，通过 $\alpha$ - Blending 过程，渲染透明材质物体结果：
+
 $$
 C(p) = \sum_{i=1}^N c'_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
 $$
 
-其中，$c'_i$ 是当前视角 $V$ 下的光照颜色，$\alpha_i=o_i\cdot \exp\{-\frac12(p-\mu'_i)\Sigma_i^{'-1}(p-\mu_i')\}$ 是透明度渲染权重，$\mu'_i$，$\Sigma'_i$ 是投影坐标空间下高斯球中心位置和协方差矩阵。
+其中，$c_i’$ 是当前视角 $V$ 下的光照颜色，$ \alpha_i = o_i \cdot \exp\{-\frac12(p-\mu_i‘)\Sigma_i^{'-1}(p-\mu_i')\}$ 是透明度渲染权重，$\mu_i’$，$\Sigma_i'$ 是投影坐标空间下高斯球中心位置和协方差矩阵。
 
 <p align="center">
   <img src="assets/image-20240823172511856.png" width="400" />
@@ -82,7 +83,7 @@ $$
 
 ### 2.2 Motivation
 
-由于 3DGS 渲染时，采用 $\alpha$-Blending过程，在透明度 $T=\prod_j(1-\alpha_j)$ 达到 $0.99$ 时终止渲染，并输出颜色结果。
+由于 3DGS 渲染时，采用 $\alpha$-Blending过程，在透明度 $T=\prod_j(1-\alpha_j)$ 达到 0.99 时终止渲染，并输出颜色结果。
 
 本项目基于以下观察：**对于较大范围场景中，物体之间相互遮挡现象很多，这会造成在在 `rendering` 阶段，实际对图像有贡献的 3DGS 占比很少，即在 $T=0.99$时，之后的高斯球没有参与渲染。**
 
@@ -150,10 +151,10 @@ depth_mipmap = HZB[level];
 
 3. 启发式策略：选择对渲染有贡献的所有高斯球，并对深度进行混合 `z_mean`
 
-   $$
-   Z_{mean}(p) = \sum_{i=1}^N z_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
-   $$
-   
+$$
+ Z_{mean}(p) = \sum_{i=1}^N z_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
+$$
+
 #### Depth Regularization
 
 考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) 的做法，采取了以下深度正则化方式：
