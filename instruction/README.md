@@ -66,7 +66,7 @@ $$
 C(p) = \sum_{i=1}^N c'_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
 $$
 
-其中，$c_i’$ 是当前视角 $V$ 下的光照颜色，$ \alpha_i = o_i \cdot \exp\{-\frac12(p-\mu_i‘)\Sigma_i^{'-1}(p-\mu_i')\}$ 是透明度渲染权重，$\mu_i’$，$\Sigma_i'$ 是投影坐标空间下高斯球中心位置和协方差矩阵。
+其中，$c_i^{\prime}$ 是当前视角 $V$ 下的光照颜色，$ \alpha_i = o_i \cdot \exp\{-\frac12(p-\mu_i^{\prime})\Sigma_i^{{\prime}-1}(p-\mu_i^{\prime})\}$ 是透明度渲染权重，$\mu_i^{\prime}$，$\Sigma_i^{\prime}$ 是投影坐标空间下高斯球中心位置和协方差矩阵。
 
 <p align="center">
   <img src="assets/image-20240823172511856.png" width="400" />
