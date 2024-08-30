@@ -6,20 +6,17 @@
 
 - RTX4060
 
-- WINDOWS 11, Visual Studio 2019, CUDA 12.2，7zip
+- WINDOWS 11, Visual Studio 2019, CUDA 12.2, 7zip
 
 ### 1.2 Projects
 
-- [**SIBR_views**](https://git.woa.com/LQTech/rainzorwang/SIBR_viewers.git)：3DGS渲染器
-  - master：原始3DGS渲染器
-  - **HZB：本项目完成的基于深度剔除的3DGS渲染器**
-- [**diff-gaussian-rasteration**](https://git.woa.com/LQTech/rainzorwang/diff-gaussian-rasterization.git)：CUDA内核，用于渲染器调用，得到渲染结果
+- [**Renderer-3dgs**](https://github.com/Rainzor/Renderer-3dgs)：3DGS渲染器
+  - **master：基于深度剔除的3DGS渲染器**
+- [**diff-gaussian-rasteration**](https://github.com/Rainzor/diff-gaussian-rasterization)：CUDA内核，用于渲染器调用，得到渲染结果
   - main：训练3DGS模型的CUDA内核
-  - debug：Debug调试CUDA内核
-  - fast_culling：原始3DGS渲染器调用的CUDA内核
-  - **HZB：本项目完成的基于深度剔除的CUDA内核**
-- [gaussian-splatting](https://git.woa.com/LQTech/rainzorwang/gaussian-splatting)：3DGS原论文 **[[Paper]](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/)**
-- [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) ：利用深度正则化损失函数优化3DGS训练模型  **[[Paper]](https://baowenz.github.io/radegs/)**
+  - **HZB：基于深度剔除的CUDA内核**
+- [gaussian-splatting](https://github.com/graphdeco-inria/gaussian-splatting)：3DGS原论文 **[[Paper]](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/)**
+- [RaDe-GS](https://github.com/BaowenZ/RaDe-GS) ：利用深度正则化损失函数优化3DGS训练模型  **[[Paper]](https://baowenz.github.io/radegs/)**
 
 ### 1.3 Command Lines
 
@@ -34,7 +31,7 @@ cmake --build build --target install --config Release -j
 
 **SIBR-Views** 在 cmake 阶段自动拷贝 **diff-gaussian-rasteration** 文件内容并进行编译
 
-在 **YOUR_MODELS** 文件中，需要保证是 [**3DGS**](https://git.woa.com/LQTech/rainzorwang/gaussian-splatting) 项目的标准输出格式
+在 **YOUR_MODELS** 文件中，需要保证是 [**3DGS**](https://github.com/graphdeco-inria/hierarchical-3d-gaussians) 项目的标准输出格式
 
 在命令行中设置了非垂直同步，便于看到帧率变化
 
@@ -156,7 +153,7 @@ $$
 
 #### Depth Regularization
 
-考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) 的做法，采取了以下深度正则化方式: 
+考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://github.com/BaowenZ/RaDe-GS) 的做法，采取了以下深度正则化方式: 
 
 $$
 L_d=\sum_{all\ pixels}{\sum_{i=1}^N\sum_{j=1}^{i-1}\alpha_i\alpha_j(z_i-z_j)^2}
