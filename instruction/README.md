@@ -159,7 +159,7 @@ $$
 考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) 的做法，采取了以下深度正则化方式: 
 
 $$
-\mathcal{L}_d=\sum_{all\;pixels}{\sum_{i=1}^N\sum_{j=1}^{i-1}\alpha_i\alpha_j(z_i-z_j)^2}
+L_d=\sum_{all\;pixels}{\sum_{i=1}^N\sum_{j=1}^{i-1}\alpha_i\alpha_j(z_i-z_j)^2}
 $$
 
 其中 $\alpha$ 是高斯球的权重和颜色累计计算相同， $z$  是每个高斯球在相机空间中的深度值。
