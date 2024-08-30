@@ -1,4 +1,4 @@
-# 3DGS-Depth-Culling
+# INSTRUCTION
 
 ## 1. How to Use
 
@@ -11,7 +11,15 @@
 ### 1.2 Projects
 
 - [**SIBR_views**](https://git.woa.com/LQTech/rainzorwang/SIBR_viewers.git)：3DGS渲染器
+  - master：原始3DGS渲染器
+  - **HZB：本项目完成的基于深度剔除的3DGS渲染器**
 - [**diff-gaussian-rasteration**](https://git.woa.com/LQTech/rainzorwang/diff-gaussian-rasterization.git)：CUDA内核，用于渲染器调用，得到渲染结果
+  - main：训练3DGS模型的CUDA内核
+  - debug：Debug调试CUDA内核
+  - fast_culling：原始3DGS渲染器调用的CUDA内核
+  - **HZB：本项目完成的基于深度剔除的CUDA内核**
+- [gaussian-splatting](https://git.woa.com/LQTech/rainzorwang/gaussian-splatting)：3DGS原论文 **[[Paper]](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/)**
+- [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) ：利用深度正则化损失函数优化3DGS训练模型  **[[Paper]](https://baowenz.github.io/radegs/)**
 
 ### 1.3 Command Lines
 
@@ -26,7 +34,7 @@ cmake --build build --target install --config Release -j
 
 **SIBR-Views** 在 cmake 阶段自动拷贝 **diff-gaussian-rasteration** 文件内容并进行编译
 
-在 **YOUR_MODELS** 文件中，需要保证是 [**3DGS**](https://github.com/graphdeco-inria/hierarchical-3d-gaussians) 项目的标准输出格式
+在 **YOUR_MODELS** 文件中，需要保证是 [**3DGS**](https://git.woa.com/LQTech/rainzorwang/gaussian-splatting) 项目的标准输出格式
 
 在命令行中设置了非垂直同步，便于看到帧率变化
 
@@ -56,9 +64,12 @@ cmake --build build --target install --config Release -j
 $$
 C(p) = \sum_{i=1}^N c'_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
 $$
+
 其中，$c'_i$ 是当前视角 $V$ 下的光照颜色，$\alpha_i=o_i\cdot \exp\{-\frac12(p-\mu'_i)\Sigma_i^{'-1}(p-\mu_i')\}$ 是透明度渲染权重，$\mu'_i$，$\Sigma'_i$ 是投影坐标空间下高斯球中心位置和协方差矩阵。
 
-<img src="assets/image-20240823172511856.png" alt="image-20240823172511856" style="zoom: 33%;" />
+<p align="center">
+  <img src="assets/image-20240823172511856.png" width="400" />
+</p>
 
 在 3DGS 渲染CUDA代码实现过程中，主要分成了三个阶段：
 
@@ -108,13 +119,15 @@ $$
 
 > 注：这里的depth buffer 与传统意义上的depth buffer不同，传统的depth buffer常用在前处理阶段，然而由于3DGS采用的是类似于透明度渲染的方式，导致depth buffer计算很困难，因此需要借助上一帧的depth buffer值来进行前处理。
 
-这样的时间重用方法借鉴了实时渲染中 **reverse reprojection** 的思路。
+本项目的思路实际上借鉴了实时渲染中 **reverse reprojection** 的思路。
 
 #### Hierarchical Depth Buffer
 
 在利用上一帧的 `depth_buffer` 时，采用的方法是根据高斯球占据所有像素位置处 `depth_buffer` 值与高斯球深度 `z` 进行比较，但是在实验中发现，大多数高斯球在屏幕空间占据的像素数目呈以下分布形式：
 
-<img src="assets/ellipse.png" alt="ellipse" style="zoom:50%;" />
+<p align="center">
+  <img src="assets/ellipse.png" width="400" />
+</p>
 
 上面的分布说明，采取逐像素比较的策略是十分耗时的，因此应当在创建 `depth_buffer` 时，为其生成 **Mipmap**，即最后得到  **Hierarchical Depth (Z) Buffer (HZB)** ，当高斯球深度需要与 `depth_buffer`，根据其占据像素个数，选择合适的 Mipmap Level，然后再进行比较选择是否剔除高斯球。
 
@@ -136,18 +149,20 @@ depth_mipmap = HZB[level];
 2. 激进策略：选择在渲染透明度达到50%时，即 $T=0.5$ 时高斯球的深度 `z_mid`
 
 3. 启发式策略：选择对渲染有贡献的所有高斯球，并对深度进行混合 `z_mean`
+
    $$
    Z_{mean}(p) = \sum_{i=1}^N z_i\alpha_i\prod_{j=1}^{i-1}(1-\alpha_j)
    $$
    
-
 #### Depth Regularization
 
-考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://baowenz.github.io/radegs/) 的做法，采取了以下深度正则化方式：
+考虑到本项目中充分利用了高斯球的深度信息，如果在训练阶段考虑深度正则优化，对渲染有贡献的高斯球尽可能地分布在物体表面附近，这将提高深度剔除的效率，因此本项目参考 [RaDe-GS](https://git.woa.com/LQTech/rainzorwang/RaDe-GS) 的做法，采取了以下深度正则化方式：
+
 $$
 \mathcal{L}_d=\sum_{all\;pixels}{\sum_{i=1}^N\sum_{j=1}^{i-1}\alpha_i\alpha_j(z_i-z_j)^2}
 $$
-其中 $\alpha$ 是高斯球的权重，和颜色累计计算相同，$z$  是每个高斯球在相机空间中的深度值。
+
+其中 $\alpha$ 是高斯球的权重和颜色累计计算相同，$z$  是每个高斯球在相机空间中的深度值。
 
 ## 3. Experiment
 
@@ -161,9 +176,11 @@ $$
 
 接着，对比了不同的 `depth_value` 计算策略下，对图片质量的影响，采用了 **PSNR** 作为参考值。
 
-<img src="assets/image-20240826171646374.png" alt="image-20240826171646374" style="zoom:50%;" />
+<p align="center">
+  <img src="assets/image-20240826171646374.png" width="400" />
+</p>
 
-可以看到，我们的保守策略和启发式策略相比于传统的3DGS渲染质量几乎没有影响，但是启发式策略会导致图像质量有较大偏差。
+可以看到，我们的保守策略和激进式策略相比于传统的3DGS渲染质量几乎没有影响，但是启发式策略会导致图像质量有较大偏差。
 
 ### 3.2 Depth Regularization
 
@@ -189,6 +206,7 @@ $$
 
 1. 在实验中我们注意到深度正则化对于我们的方法有很大的帮助，且对于启发式策略的质量改善也有贡献，因此未来的工作中定义更好的深度正则化函数，让高斯球在物体表面聚集，且渲染最终也终止在物体表面附近，将能极大的发挥我们工作的加速效果
 
-2. 在3DGS渲染的流程中，有20%的时间开销被用来进行高斯球的排序过程，以辅助后续渲染流程，确定 **$\alpha$-blending** 的渲染顺序。但是，在前后两帧之间，参与渲染的高斯球顺序大体上是没有变化的，所以，如果能够重用前一帧的排序结果，以加速当前帧的排序流程，将能更好的加速整体渲染流程。
+2. 在3DGS渲染的流程中，有20%的时间开销被用来进行高斯球的排序过程，以辅助后续渲染流程，确定 $\alpha$ **- blending** 的渲染顺序。但是，在前后两帧之间，参与渲染的高斯球顺序大体上是没有变化的，所以，如果能够重用前一帧的排序结果，以加速当前帧的排序流程，将能更好的加速整体渲染流程。
 
    一种可行的思路是：构建一个 `Sort Tree`，这样在连续帧之间，只需要对 `Sort Tree` 中的节点进行小范围增、删、改，就可以避免每次渲染时重头排序的流程，也可以加速3DGS渲染。
+
